@@ -1,0 +1,11 @@
+# exclude gradle's output directories
+build/*
+src/build
+src/.gradle
+src/.gradle/*
+
+# exclude IDE stuff
+*.iml
+.classpath
+.project
+.settings

@@ -1,0 +1,4 @@
+moduleName=marc4j-map-module
+moduleVersion=1.0-SNAPSHOT
+extensionClasses=edu.ncsu.lib.marc.RecordExtension,edu.ncsu.lib.marc.DataFieldExtension,edu.ncsu.lib.marc.SubfieldExtension
+
