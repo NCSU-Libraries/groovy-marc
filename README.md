@@ -1,9 +1,9 @@
-= Groovy MARC Extensions
+# Groovy MARC Extensions
 
 This project contains a set of Groovy Extensions and utilities for [marc4j](https://github.com/marc4j/marc4j)
 that allow for more "groovyesque" processing of MARC records.
 
-==Background
+## Background
 
 MARC records don't really support a path-like expression language for navigation
 and manipulation, but they get close enough that I thought I'd give it a shot.
@@ -18,7 +18,7 @@ JVM-based environment seems like a good idea to you.  If you're avoiding
 writing Java code for whatever reason and want to use a dynamic language, Groovy
 suggests itself as an option (well, I suggest Groovy as an option).
 
-Despite its strengths in Java integration, Groovy makes dealing with `char`
+Despite its general strengths in Java integration, Groovy makes dealing with `char`
 literals (which are all over the place in the marc4j API) painful and fussy.
 So this project tries to sweep most of that under the rug.  It also tries to make creating
 marc4j API objects pretty simple, e.g. `$athis is my subfield a` can be turned into an appropriate
@@ -31,7 +31,7 @@ Finally, it adds a bit of syntactic sugar for reading MARC records in a groovesq
 is only available when the library is compiled under Java 8.
 
 
-=== Examples
+### Examples
 ```
 
         // assume 'rec' is a marc4j Record instance
@@ -63,7 +63,7 @@ is only available when the library is compiled under Java 8.
         }
 ```
 
-=== Usage
+### Usage
 
 Compile it (the build system is [Gradle](http://www.gradle.org), and put the resulting jar
 (output into `build/libs/groovy-marc-${VERSION}.jar`) on your classpath.
@@ -83,7 +83,7 @@ operations.
 -- Adam
 
 
-=== License
+### License
 
 GNU GPL v3.  (c) 2015 North Carolina State University.
 
