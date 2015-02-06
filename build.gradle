@@ -1,7 +1,16 @@
+def version = org.gradle.internal.jvm.Jvm.current().getJavaVersion()
+
+sourceCompatibility= version.isJava8Compatible() ? "1.8" : "1.7"
+targetCompatibility= sourceCompatibility
+
+
+apply plugin: 'groovy'
+
 configurations {
     jansi.extendsFrom(runtime)
     compile.transitive = true
 }
+
 
 dependencies {
  compile  'info.freelibrary:freelib-marc4j:2.6.3@jar'
@@ -12,8 +21,27 @@ dependencies {
  jansi    'org.fusesource.jansi:jansi:1.11'
 }
 
-sourceSets.main.java.srcDirs = []
-sourceSets.main.groovy.srcDir 'src/main/java'
+task checkCompatibility() {
+    description "Checks JDK compatiblity and excludes JDK8-only classes from build for older JVMs"
+    sourceSets.main.java.srcDirs = []
+    sourceSets.main.groovy.srcDir 'src/main/java'
+    // the Reader class does a whole bunch of spliterator business that is only
+    // available in java 8
+    if ( !version.isJava8Compatible() ) {
+        sourceSets.main.groovy.exclude '**/marc/Reader.groovy'
+        sourceSets.main.groovy.exclude '**/marc/RecordSpliterator.groovy'
+        jar.archiveName = "groovy-marc-${project.version}-jdk7.jar"
+        println "Compiling with JDK < 8, excluding certain classes"
+    }
+}
+
+
+
+compile.dependsOn checkCompatibility
+
+
+
+
 
 
 groovydoc {
