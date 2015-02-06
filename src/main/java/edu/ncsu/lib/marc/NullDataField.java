@@ -1,5 +1,23 @@
 package edu.ncsu.lib.marc;
 
+/*
+
+     Copyright (C) 2015 North Carolina State University
+
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import groovy.lang.GroovyObjectSupport;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
@@ -14,14 +32,17 @@ import java.util.List;
  * Instances of this class are created when using the GroovyMARC expression language to query for fields and the fields
  * do not exist on the record.  Since these queries can be combined seamlessly with assignment operations, we needed a
  * way to automatically create a field of the appropriate type.  This class supports "autovivification" of fields and
- * helps avoid <code>NullPointerException</code>s in Groovy code.
+ * helps avoid <code>NullPointerException</code>s in Groovy code,
+ *
+ * e.g. <code>record['245$a'] = 'Word and Object'</code> is an expression that either sets the value of an
+ * existing 245$a field, or creates a new one with the specified value if it does not already exist.
  *
  * <p>
  * Instances of this class evaluate as <code>false</code> in groovy boolean contexts.  Setters are generally no-ops, and
  * getters return null or empty values (where appropriate).  The exception to this rule is <code>getTag()</code> which
  * always returns the originally requested tag value (to aid in autovivification).
  * </p>
- * @author ajconsta
+ * @author adjam
  */
 public class NullDataField extends GroovyObjectSupport implements DataField {
 

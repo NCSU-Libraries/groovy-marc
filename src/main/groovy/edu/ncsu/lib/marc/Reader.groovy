@@ -1,4 +1,21 @@
 package edu.ncsu.lib.marc
+/*
+
+     Copyright (C) 2015 North Carolina State University
+
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import groovy.util.logging.Slf4j
 import org.marc4j.MarcReader
 import org.marc4j.MarcStreamReader
@@ -11,6 +28,9 @@ import java.util.stream.StreamSupport
 /**
  * MARC reader extension that implements Iterable and adds methods to marc4j's Record class to make it a bit easier to write
  * simple processors for records.
+ * <p>
+ *     <b>NB</b> JDK 8+only.
+ * </p>
  */
 @Slf4j
 class Reader implements Iterable<Record>, Iterator<Record>, AutoCloseable {

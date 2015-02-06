@@ -1,5 +1,22 @@
 package edu.ncsu.lib.marc
 
+/*
+
+     Copyright (C) 2015 North Carolina State University
+
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
 import org.marc4j.marc.*
@@ -9,11 +26,13 @@ import static edu.ncsu.lib.CharUtils.toChar
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Created with IntelliJ IDEA.
- * User: ajconsta
- * Date: 10/25/13
- * Time: 2:39 PM
- * To change this template use File | Settings | File Templates.
+ * Converts expressions for MARC fields and subfields into the appropriate closures.
+ *
+ * TODO : add more interesting documentation and behavior based on field
+ * definitions (e.g. non-repeatable fields should not have "listy" behavior unless
+ * operating in non-strict mode))
+ *
+ * @see RecordExtension
  */
 @Slf4j
 class ExpressionParser {

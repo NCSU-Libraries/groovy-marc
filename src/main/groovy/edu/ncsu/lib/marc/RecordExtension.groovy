@@ -1,11 +1,28 @@
 package edu.ncsu.lib.marc
+/*
+
+     Copyright (C) 2015 North Carolina State University
+
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import groovy.xml.MarkupBuilder
 import org.marc4j.Constants
 import org.marc4j.marc.ControlField
 import org.marc4j.marc.DataField
 import org.marc4j.marc.Record
-
-
+import org.marc4j.marc.Subfield
 /**
  * Extension for Marc4J's <code>Record</code> class that allows accessing fields and subfields via groovy-esque syntax.
  * <p>
@@ -13,6 +30,7 @@ import org.marc4j.marc.Record
  *     the returned object is a
  */
 public class RecordExtension {
+
 
 
     private static Map converters = ['a': { it } ]
@@ -147,8 +165,9 @@ public class RecordExtension {
                 }
                 rec.dataFields.each { df ->
                     datafield(tag:df.tag,ind1:df.indicator1, ind2:df.indicator2) {
-                        df.subfields.each { sf ->
-                        subfield(code:sf.code, converter(sf.data))
+                        df.subfields.each { Subfield sf ->
+
+                        subfield(code:sf.code, converter ? converter(sf.data) : sf.data )
                         }
                     }
                 }
