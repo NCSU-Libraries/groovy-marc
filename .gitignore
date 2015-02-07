@@ -5,7 +5,9 @@ src/.gradle
 src/.gradle/*
 
 # exclude IDE stuff
+.idea
 *.iml
 .classpath
 .project
+.gradle
 .settings

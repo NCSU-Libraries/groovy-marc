@@ -1,16 +1,32 @@
-def version = org.gradle.internal.jvm.Jvm.current().getJavaVersion()
-
-sourceCompatibility= version.isJava8Compatible() ? "1.8" : "1.7"
-targetCompatibility= sourceCompatibility
-
-
 apply plugin: 'groovy'
+
+import org.gradle.internal.jvm.Jvm
+
+def javaVersion = Jvm.current().getJavaVersion()
+
+def sourceTarget = javaVersion.isJava8Compatible() ? "1.8" : "1.7"
+
+sourceCompatibility = sourceTarget
+targetCompatibility=  sourceTarget
+
+project.group = 'edu.ncsu.lib'
+project.version = "0.5"
+
+repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+}
 
 configurations {
     jansi.extendsFrom(runtime)
     compile.transitive = true
 }
 
+sourceSets {
+	jdk7 
+}
+		
 
 dependencies {
  compile  'info.freelibrary:freelib-marc4j:2.6.3@jar'
@@ -19,30 +35,32 @@ dependencies {
      transitive = true
   }
  jansi    'org.fusesource.jansi:jansi:1.11'
+  compile 'org.codehaus.groovy:groovy-all:2.4.0@jar'
+  testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 }
 
 task checkCompatibility() {
     description "Checks JDK compatiblity and excludes JDK8-only classes from build for older JVMs"
-    sourceSets.main.java.srcDirs = []
-    sourceSets.main.groovy.srcDir 'src/main/java'
     // the Reader class does a whole bunch of spliterator business that is only
     // available in java 8
-    if ( !version.isJava8Compatible() ) {
-        sourceSets.main.groovy.exclude '**/marc/Reader.groovy'
+    if ( !javaVersion.isJava8Compatible() ) {
+        sourceSets.main.groovy.exclude '**/marc/GroovyMarcStreamerReader.groovy'
         sourceSets.main.groovy.exclude '**/marc/RecordSpliterator.groovy'
+	sourceSets.jdk7.groovy.srcDirs.each {
+		dir ->
+ 			println "adding ${dir} to build"
+			sourceSets.main.groovy.srcDirs dir
+	}
+
         jar.archiveName = "groovy-marc-${project.version}-jdk7.jar"
         println "Compiling with JDK < 8, excluding certain classes"
+	println sourceSets.main.groovy.srcDirs
     }
 }
 
 
 
-compile.dependsOn checkCompatibility
-
-
-
-
-
+compileGroovy.dependsOn checkCompatibility
 
 groovydoc {
     def title = "GroovyMARC API"

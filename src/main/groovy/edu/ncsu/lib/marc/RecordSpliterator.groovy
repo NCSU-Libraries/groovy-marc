@@ -1,4 +1,7 @@
 package edu.ncsu.lib.marc
+
+import org.marc4j.marc.Record
+
 /*
 
      Copyright (C) 2015 North Carolina State University
@@ -16,19 +19,16 @@ package edu.ncsu.lib.marc
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import org.marc4j.marc.Record
-
 import java.util.function.Consumer
-
 /**
- * Spliterator implementation to let MarcStreamReader act as a Java 8 iterable.
+ * Spliterator implementation to let GroovyMarcStreamerReader act as a Java 8 iterable.
  * JDK 8+ only.
  **/
 class RecordSpliterator implements Spliterator<Record> {
 	
-	private Reader reader;
+	private GroovyMarcStreamerReader reader;
 	
-	public RecordSpliterator(Reader reader) {
+	public RecordSpliterator(GroovyMarcStreamerReader reader) {
 		this.reader = reader;
 	}
 

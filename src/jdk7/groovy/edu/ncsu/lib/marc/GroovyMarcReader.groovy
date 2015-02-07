@@ -22,29 +22,41 @@ import org.marc4j.MarcStreamReader
 import org.marc4j.MarcXmlReader
 import org.marc4j.marc.Record
 
-import java.util.function.Consumer
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 /**
- * MARC reader extension that implements Iterable and adds methods to marc4j's Record class to make it a bit easier to write
- * simple processors for records.
+ * Decorator for marc4j MarcReader classes that adds iterabilityb (and thus all the standard Groovy collection
+ * methods) and auto-closeability to the underlying reader.  This implementation does not have the JDK 8 Streams
+ * functionality in <code>GroovyMarcStreamerReader</code>, but is otherwise compatible.
  * <p>
- *     <b>NB</b> JDK 8+only.
+ *     Sample usage:
+ *     <pre>
+ *     <code>
+ *         def r = new GroovyMarcReader( new File("sample.mrc"), encoding = "utf-8")
+ *         r.each {
+ *          Record r ->
+ *              ...
+ *         }
+ *      </code>
+ *     </pre›
  * </p>
- */
+ **/
 @Slf4j
-class Reader implements Iterable<Record>, Iterator<Record>, AutoCloseable {
-
-    enum Format {
-        MARC21,
-        XML;
-    }
+class GroovyMarcReader implements Iterable<Record>, Iterator<Record>, AutoCloseable {
 
     private MarcReader reader
 
     private InputStream inputStream
 
-    def Reader(source,format = Format.MARC21, encoding = "" ) {
+    /**
+     * Creates an instance of this class.
+     * @param source an <code>InputStream</code> or <code>File</code> for the MARC records.
+     * @param format the format of the underlying stream.  This parameter is most useful if
+     * <code>source</code> is an <code>InputStream</code>, since the <code>File</code> constructor can
+     * inspect the file's extension (defaults to MARC21 unless extension is <code>.xml</code>).
+     *
+     * @param encoding (only necessary for <code>MARC21</code> format, as <code>MarcXmlWriter</code> will
+     * autodetect encoding.  If unset, you get marc4j's default encoding.
+     */
+    def GroovyMarcReader(Object source,Format format = Format.MARC21, String encoding = "" ) {
         if ( source instanceof InputStream ) {
             this.inputStream = (InputStream)source
             switch(format) {
@@ -58,20 +70,26 @@ class Reader implements Iterable<Record>, Iterator<Record>, AutoCloseable {
                 default:
                     this.reader = new MarcXmlReader(inputStream)
             }
+        } else if ( source instanceof String || source instanceof GString  ) {
+            buildReaderFromFile(new File(source), format, encoding)
         } else if ( source instanceof File ) {
-            File input = (File) source
-            inputStream = input.newInputStream()
-            if ( input.name.endsWith(".xml") || format == Format.XML ) {
+            buildReaderFromFile((File)source,format,encoding)
+        }
+    }
+
+    private void buildReaderFromFile(File input, Format format = Format.MARC21, String encoding = "") {
+            InputStream inputStream = input.newInputStream()
+            if (  input.name.endsWith(".xml") ) {
                 reader = new MarcXmlReader(inputStream)
             } else {
                 if ( encoding ) {
-                    reader = new MarcStreamReader(inputStream, encoding)
+                    reader = new MarcStreamReader(inputStream,encoding)
+
                 } else {
                     reader = new MarcStreamReader(inputStream)
                 }
             }
         }
-    }
 
     @Override
     Iterator<Record> iterator() {
@@ -89,59 +107,19 @@ class Reader implements Iterable<Record>, Iterator<Record>, AutoCloseable {
         //return new GRecord(reader.next())
     }
 	
-	@Override
-	Spliterator<Record> spliterator() {
-		return new RecordSpliterator(this)
-	}
-
     @Override
     void remove() {
         throw new UnsupportedOperationException("Remove() not supported on this class")
     }
 	
 	public static void main(String [] args ) {
-       /*Properties moduleProps = new Properties()
-        moduleProps.setProperty("moduleName", "groovyMarc")
-        moduleProps.setProperty("moduleVersion", "1.0")
-        moduleProps.setProperty("extensionClasses", "edu.ncsu.lib.marc.RecordExtension,edu.ncsu.lib.marc.DataFieldExtension,edu.ncsu.lib.marc.SubfieldExtension")
-        def module = MetaInfExtensionModule.newModule( moduleProps, Reader.class.getClassLoader() )
-        module.instanceMethodsExtensionClasses.each {
-            println it
-        }
-        */
-
-		def r = new Reader( new File("/Users/ajconsta/Documents/workspace/symphony-ole-migrator/data/sample.mrc").newInputStream() )
-        r.stream().forEach {
-            println it.leader
+		def r = new GroovyMarcReader( args[0] )
+        	r.stream().forEach {
+            		println it.leader
    			println "001: " + it['001']
    			println "ControlNumber: " + it.controlNumber
    			println "918\$a: " +it["918|a"]
-        }
-	}
-
-	@Override
-	public void forEachRemaining(Consumer<? super Record> action) {
-		Objects.nonNull(action)
-		while( hasNext() ) {
-			action.accept(next())
-		}
-	}
-
-    /**
-     * Get the contents of this reader as a Stream.
-     * @return
-     */
-    public Stream<Record> stream() {
-        return StreamSupport.stream( Spliterators.spliteratorUnknownSize(this.iterator(), Spliterator.ORDERED), false);
-    }
-
-	@Override
-	public void forEach(Consumer<? super Record> action) {
-		Objects.nonNull(action)
-		while( hasNext() ) {
-			action.consume(next())
-		}
-		
+        	}
 	}
 
     @Override
