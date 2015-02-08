@@ -49,9 +49,9 @@ classifier in this case).
 In general, the idea is to allow access to the fields and subfields of a MARC
 record using standard groovy map-style expressions, e.g.
 
-- `record["245"]` returns all the 245 fields on the record as a list (yes, even though it's non-repeatable)
+- `record["245"]` - returns all the 245 fields on the record as a list (yes, even though it's non-repeatable)
 - `record['245']['a']` - returns the 245$a subfield (as a list)
-- `record['245'][1]` - (note integer literal here in second index) gets the value of the first indicator.
+- `record['245'][1]` - gets the value of the first indicator (note integer literal here in second index).
 - `record["245|a"]` - returns the 245 subfield 'a' values; this is equivalent to the second example above.
 - `record['245']` - supports a "boolean" interpretation, i.e. the expression can be used to check for the presence of a field.
 
@@ -73,24 +73,22 @@ Operations that mutate (alter) records are somewhat more tricky, but the followi
 
 - `record["245"][2] = '1'` - sets the value of the second indicator to  '1' (a `char`)
 - `record["245"]["a"] = "2 Kill 2 Mockingbird"` - sets the value of subfield 'a'.
-- `record["035"] << ["a|(OCoLC)ocm0001"]` adds a subfield 'a' with a value to an 035 field.
+- `record["035"] << ["a|(OCoLC)ocm0001"]` -- adds a subfield 'a' with a value to an 035 field.
 
-This last should be unpacked -- if the field already exists, the subfield will be added to that field.  If the tag
-does not exist on the record, a new DataField will be created, and the subfield added.  Such "autovivified" fields will
- have both indicators set to blank.
+This last should be unpacked -- if the field already exists, the subfield will be added to that field.  If the field
+does not exist on the record, a new DataField will be created, and the subfield added.  Such "autovivified" fields will have both indicators set to blank.
 
 The extensions will generally let you do whatever marc4j does with respect to creating "badly formed" records (repeating nonrepeatable fields and subfields,
 particularly), although it has a few gestures in the direction of supporting a "strict" mode.
 
 Removing fields currently requires "dropping back" to the marc4j API, e.g.:
 
-```record['999'].each {
-    it ->  // 'it' will be a DataField object
-        if ( it['v'] =~ /WITHDRAWN/ ) { // and yet this regex-based test works on the subfield "directly"!
-            record.removeVariableField(it)
-        }
+    record['999'].each {
+        it ->  // 'it' will be a DataField object
+            if ( it['v'] =~ /WITHDRAWN/ ) { // and yet this regex-based test works on the subfield "directly"!
+                record.removeVariableField(it)
+            }
     }
-```
 
 Finally, and this is something added to support a specific data migration task, the extension adds a `toXML()` method to the
 marc4j `Record` class.  This will yield up the record converted to a MARCXML string, but note that the `marc:record` element
@@ -98,47 +96,40 @@ will be *wrapped in a `marc:collection` element*.
 
 Some Examples:
 
-```
-
-        // assume 'rec' is a marc4j Record instance
-        // get the 245 field
-        def titleField =  rec['245']
-        // extract the 'a' subfield; this is 'null safe' in that
-        // even if the record has no 245, the above query returns
-        // a usable object so this will not fail outright
-        def mainTitle = titleField['a'] // titleField['$a'] also works
-
-        // or, even faster
-        def stitle = rec['245$a']
-         // equivalent to the above
-        def ptitle = rec['245|a']
-
-        // fun with indicators
-        def issns = rec['022'] // issns is a (possibly empty) list
-        issns.each { issn ->
-            // issn is a DataField instance
-            // note that above we accessed a subfield using a string ('a')
-            // if we use an integer that's 1 or 2, we get the value of the first
-            // or second indicator
-            // indicators access via integer indexes
-            if ( issn[1] == '1' ) {
-                // note that '1' is a char in marc4j
-                // in this API we return a string
-                println "Non-International ISSN: ${issn['a']}"
-            }
+    // assume 'rec' is a marc4j Record instance
+    // get the 245 field
+    def titleField =  rec['245']
+    // extract the 'a' subfield; this is 'null safe' in that
+    // even if the record has no 245, the above query returns
+    // a usable object so this will not fail outright
+    def mainTitle = titleField['a'] // titleField['$a'] also works
+    // or, even faster
+    def stitle = rec['245$a']
+    // equivalent to the above
+    def ptitle = rec['245|a']
+    
+    // fun with indicators
+    def issns = rec['022'] // issns is a (possibly empty) list
+    issns.each { issn ->
+        // issn is a DataField instance
+        // note that above we accessed a subfield using a string ('a')
+        // if we use an integer that's 1 or 2, we get the value of the first
+        // or second indicator
+        // indicators access via integer indexes
+        if ( issn[1] == '1' ) {
+            // note that '1' is a char in marc4j
+            // in this API we return a string because it's specifically for use in Groovy
+             println "Non-International ISSN: ${issn['a']}"
         }
-```
+    }
 
 ### Usage
 
-Compile it (the build system is [Gradle](http://www.gradle.org), and put the
-resulting jar
-(output into `build/libs/groovy-marc-${VERSION}.jar`) on your classpath.
+Build the extensions with [Gradle](http://www.gradle.org), and put the
+resulting jar (output into `build/libs/groovy-marc-${VERSION}.jar`) on your classpath.
 
-Once you do this, the extensions are loaded and immediately available
-to any of your Groovy code, without further intervention on your part, e.g. no
-matter how you get your hands on a marc4j `Record` instance, the extension
-methods can be invoked on it.
+Groovy loads and makes the extensions available for use if the JAR is on your classpath,  
+without further intervention on your part.
 
 Currently there is no usage guide beyond this README, but if you look at the source code of the
 tests under `src/test/groovy`, you'll see some sample use patterns.
