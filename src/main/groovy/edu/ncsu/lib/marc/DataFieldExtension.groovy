@@ -1,5 +1,9 @@
 package edu.ncsu.lib.marc
 
+import edu.ncsu.lib.CharUtils
+import org.marc4j.marc.DataField
+import org.marc4j.marc.Record
+
 /*
 
      Copyright (C) 2015 North Carolina State University
@@ -17,9 +21,8 @@ package edu.ncsu.lib.marc
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import org.marc4j.marc.DataField
-import org.marc4j.marc.Record
 import org.marc4j.marc.Subfield
+
 /**
  * A set of extensions to the Marc4j <code>DataField</code> class to allow reading and writing it using Groovyesque syntax.
  *
@@ -229,6 +232,30 @@ class DataFieldExtension {
 
     private static char getSubfieldCode(String expr) {
         (char)( expr.charAt(0) == '$' && expr.length() > 1 ? expr.charAt(1) : expr.charAt(0) )
+    }
+
+    /**
+     * Extends DataField to dynamically add a getSubfield(String) method, making it easier
+     * to use the method from within Groovy code.
+     * @param field the field.
+     * @param subFieldCode a string whose first character will be extracted and passed to
+     * DataField.getSubfield(char).
+     * @return the first subfield matching (the first character of) <code>subFieldCode</code>
+     */
+    public static Subfield getSubfield(DataField field, String subFieldCode) {
+        return field.getSubfield(CharUtils.toChar(subFieldCode))
+    }
+
+    /**
+     * Extends DataField to dynamically add a getSubfields(String) method, making it easier
+     * to use he method within Groovy code.
+     * @param field the field to be accessed
+     * @param subFieldCode a string whose first character will be extracted and passed to <code>DataField.getSubfields(char)</code>
+     *
+     * @return all subfields matching <code>subFieldCode</code>.
+     */
+    public static List<Subfield> getSubfields(DataField field, String subFieldCode) {
+        return field.getSubfields(CharUtils.toChar(subFieldCode))
     }
 
     /**

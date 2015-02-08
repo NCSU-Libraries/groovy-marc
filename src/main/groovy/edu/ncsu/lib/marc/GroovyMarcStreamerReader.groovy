@@ -106,7 +106,6 @@ class GroovyMarcStreamerReader implements Iterable<Record>, Iterator<Record>, Au
     @Override
     Record next() {
             return reader.next()
-        //return new GRecord(reader.next())
     }
 	
 	@Override
