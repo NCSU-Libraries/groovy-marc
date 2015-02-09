@@ -50,7 +50,6 @@ class NonrepeatableFieldHandler extends FieldHandler {
                 Object value ->
                     if (value instanceof List) {
                         if (Util.isListOfStrings((List) value)) {
-                            println("hey, adding a list of strings to the nonrepeatable field: ${tag} : ${value}")
                             return handleLeftShift(rec, (List<String>) value)
                         } else if (value.every { it instanceof Subfield }) {
                             value.each { Subfield sf ->

@@ -83,6 +83,10 @@ class RepeatableFieldHandler extends FieldHandler {
         list
     }
 
+    private DataField addValue(Record rec, String value ) {
+        addFieldSingleSubfield(rec,value)[0]
+    }
+
     List<VariableField> setValues(Record rec, List<String> values) {
         read(rec).each { VariableField field ->
             rec.removeVariableField(field)

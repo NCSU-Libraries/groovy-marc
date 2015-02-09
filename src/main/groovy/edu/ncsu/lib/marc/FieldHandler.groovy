@@ -22,7 +22,8 @@ import org.marc4j.marc.Record
 import org.marc4j.marc.VariableField
 
 /**
- * Base class for expressions that work with MARC fields.
+ * Base class for expressions that work with MARC fields.   FieldHandlers are necessary to provide for
+ * expressions that implicitly require different arguments and which return different types of values.
  */
 abstract class FieldHandler {
 
@@ -64,8 +65,6 @@ abstract class FieldHandler {
     }
 
     def read(Record rec) {
-        println("read called on ${this.class.name}")
-        println this.fieldClosure.class.name
         this.fieldClosure.call(rec, "whatevs")
     }
 
@@ -83,67 +82,6 @@ abstract class FieldHandler {
             fields[0].data = values
         }
     }
-
-    /*
-    def addFieldValues(rec, values) {
-        def returnables = []
-        switch (expressionType) {
-            case ExpressionType.CONTROL:
-                if (values instanceof List) {
-                    throw new IllegalArgumentException("${tag} is a control field, you tried to set multiple values")
-                }
-                def cf = factory.newControlField(tag, values)
-                returnables << cf
-                rec.addVariableField(cf)
-                break
-            case ExpressionType.REPEATABLE_FIELD:
-                if (!values instanceof List) {
-                    values = [values]
-                }
-                values.each {
-                    val ->
-                        def field = factory.newDataField(tag, BLANK, BLANK)
-                        def sf, sfVal = val.split("\\|")
-                        if (sf && sfVal) {
-                            field.addSubfield(factory.newSubfield(sf.charAt(0), sfVal))
-                        }
-                        returnables << field
-                        rec.addVariableField(field)
-                }
-                break
-            case ExpressionType.REPEATABLE_SUBFIELD:
-                if ( ! ( values instanceof List ) ) {
-                    values = [ values ]
-                }
-                values.each { val ->
-                    def field = factory.newDataField(tag, BLANK, BLANK)
-                    field.addSubfield(factory.newSubfield((subField as char), val))
-                    returnables << field
-                    rec.addVariableField(field)
-                }
-                break
-            case ExpressionType.NONREPEATABLE_SUBFIELD:
-                def field = factory.newDataField(tag, BLANK, BLANK)
-                returnables << field
-                field.addSubfield(factory.newSubfield((char)subField, values))
-                rec.addVariableField(field)
-                break;
-            case ExpressionType.NONREPEATABLE_FIELD:
-                def field = factory.newDataField(tag, BLANK, BLANK)
-                if (!(values instanceof List)) {
-                    values = [values]
-                }
-                returnables = []
-                values.each { String val ->
-                    field.addSubfield(factory.newSubfield((char)subField, val))
-                    returnables << field
-                    rec.addVariableField(field)
-                }
-                break
-        }
-        returnables
-    }                             */
-
 
     protected VariableField makeField(String tag) {
         Util.makeField(tag)

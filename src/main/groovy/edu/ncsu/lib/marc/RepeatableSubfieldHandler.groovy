@@ -31,8 +31,7 @@ class RepeatableSubfieldHandler extends FieldHandler {
         super(clo, tag, subfield)
     }
 
-
-    List<Subfield> getValue(Record red) {
+    List<Subfield> getValue(Record rec) {
         read(rec)
     }
 

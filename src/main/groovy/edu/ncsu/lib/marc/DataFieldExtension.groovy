@@ -201,7 +201,6 @@ class DataFieldExtension {
     }
 
 
-
     /**
      * Override putAt(str, List) to allow setting many subfields in a single operation.  Note that this starts off by removing all existing
      * subfields matching <code>subfield</code>.  This provides a means of deleting all subfields by supplying an empty
@@ -274,7 +273,4 @@ class DataFieldExtension {
         }
         theField
     }
-
-
-
 }

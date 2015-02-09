@@ -17,7 +17,6 @@ package edu.ncsu.lib.marc;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import org.marc4j.marc.Subfield;
 
 /**
@@ -26,12 +25,6 @@ import org.marc4j.marc.Subfield;
 public class SubfieldExtension {
 
 
-    /**
-     * Extension to allow appending data to a subfield's value.
-     * @param subfield the subfield.
-     * @param value the data to be appended.
-     * @return the value of the data after the append.
-     */
     public static String leftShift(Subfield subfield, String value) {
         subfield.setData( subfield.getData() + value );
         return subfield.getData();
@@ -40,5 +33,6 @@ public class SubfieldExtension {
     public static Subfield fromString( Subfield subfield, String subfieldExpression) {
         return Util.makeSubfield(subfieldExpression);
     }
+
 
 }

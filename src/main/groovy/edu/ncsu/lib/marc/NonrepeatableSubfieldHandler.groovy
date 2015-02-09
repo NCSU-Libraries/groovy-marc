@@ -37,6 +37,7 @@ class NonrepeatableSubfieldHandler extends FieldHandler {
         if ( df == null ) {
             return null
         }
+        println "${tag} : ${subfield} =="
         return df.getSubfield(subfield)
     }
 
@@ -46,7 +47,6 @@ class NonrepeatableSubfieldHandler extends FieldHandler {
     }
 
     Subfield setValue(Record rec, String value) {
-        println("setValue(${subfield}, ${rec.getId()}, ${value}")
         DataField df = (DataField)rec.getVariableField(value)
         if ( df == null ) {
             df = factory.newDataField(tag, BLANK, BLANK)

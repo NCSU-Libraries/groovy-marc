@@ -85,6 +85,16 @@ class DataFieldExtensionSpecification extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def "putAt with repeatable subfield results in single value"() {
+        when:
+            assert !rec['988|a']
+            rec['988|a'] = "new stuff"
+        then:
+            rec['988|a'] instanceof List
+            rec['988|a'][0] instanceof Subfield
+            rec['988|a'][0].data == "new stuff"
+    }
+
 
 
     def "check setting indicators using putAt(int) syntax"() {
@@ -94,4 +104,6 @@ class DataFieldExtensionSpecification extends Specification {
         then:
         isbn[1] == '0'.charAt(0)
     }
+
+
 }

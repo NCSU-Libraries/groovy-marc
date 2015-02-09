@@ -104,7 +104,6 @@ class GroovyMarcReader implements Iterable<Record>, Iterator<Record>, AutoClosea
     @Override
     Record next() {
             return reader.next()
-        //return new GRecord(reader.next())
     }
 	
     @Override

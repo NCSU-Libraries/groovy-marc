@@ -55,7 +55,6 @@ class Util {
         if (m) {
             return mf.newSubfield(m[0][1].charAt(0), m[0][2])
         }
-        println("nope, ya dope: ${expression}")
         null
     }
 

@@ -69,20 +69,20 @@ class ExpressionParser {
 
 
     private static final Closure makeRepeatableFieldClosure(String tag, String subField) {
+
 		def c = subField != null && subField.length() > 0 ? toChar(subField) : ''
         return { Record rec, stuff ->
-
             def result = []
 	        def fields = rec.getVariableFields(tag)
 
            if ( c ) {
-				fields.each { VariableField fld ->
+            	fields.each { VariableField fld ->
 					if ( fld.metaClass.respondsTo(fld, "getSubfields") ) {
 						result.addAll( ((DataField)fld).getSubfields(c).collect { Subfield it -> it } )
 					}
 				}
             } else {
-				result = fields
+        		result = fields
             }
             return result
         }
@@ -97,9 +97,9 @@ class ExpressionParser {
 
     private static final Closure makeNonRepeatableFieldClosure( String tag ) {
         return { Record rec, String path ->
-            println("NRFC (no subfield)")
-                DataField df = rec.getVariableField(tag)
-                df != null ?:  new NullDataField()
+            log.trace("NRFC (no subfield)")
+            DataField df = rec.getVariableField(tag)
+            df != null ?:  new NullDataField()
         }
     }
 
@@ -131,7 +131,7 @@ class ExpressionParser {
         if ( info.repeatable ) {
             if ( hasSubfield ) {
                 def clo = makeRepeatableFieldClosure((String)field,subField)
-                return new RepeatableFieldHandler(clo, field)
+                return new RepeatableSubfieldHandler(clo, field, subField)
             } else {
                 return new RepeatableFieldHandler(makeRepeatableFieldClosure((String)field, ''), (String)field)
             }
