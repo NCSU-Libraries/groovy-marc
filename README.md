@@ -59,14 +59,7 @@ variable 'a'"), so you will either have to use single quoted strings or escape
 the '$' to use the more common form, e.g. the above expression is equivalent to
 both `record['245$a']` and `record["245\$a"]`.
 Expressions usually return lists (of ControlField, DataField, or Subfield as
-appropriate), except where the expression denotes a control field and the 245.
-
-the framework as non-repeatable, however, and so expressions involving it
-return the single value.
-
-
-    The tagging work is not yet complete (only control fields
- and the 245 will be treated as non-repeatable), however, so *most* expressions will return lists of fields.
+appropriate), except where the expression denotes a non-repeatable control field and the 245.
 
 If you want to look at all the 035s,(e.g.) you would do something like `record["035"].each {
     DataField fld -> .... }`.
