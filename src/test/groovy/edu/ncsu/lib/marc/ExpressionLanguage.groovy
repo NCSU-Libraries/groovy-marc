@@ -1,4 +1,7 @@
 package edu.ncsu.lib.marc
+
+import org.marc4j.marc.ControlField
+
 /*
 
      Copyright (C) 2015 North Carolina State University
@@ -83,14 +86,30 @@ class ExpressionLanguage extends Specification {
 
     def "assigning multiple subfields at once produces one non-repeatable field in the original order"() {
         when:
-        println("Starrting leftshift on 710")
-        def results  = rec['710'] << ['$bwait', '$bwhat', '$bis this' ]
-        println(results)
+            def results  = rec['710'] << ['$bwait', '$bwhat', '$bis this' ]
         then:
-        rec['710'] instanceof List
-        rec['710'].size() == 1
-        rec['710'][0].getSubfields('b'.charAt(0)).collect { it.data } == ['wait', 'what', 'is this']
+            rec['710'] instanceof List
+            rec['710'].size() == 1
+            rec['710'][0].getSubfields('b'.charAt(0)).collect { it.data } == ['wait', 'what', 'is this']
 
+    }
+
+    def "assigning multiple values to a nonrepeatable control field produces one control field"() {
+        when:
+            rec['003'] = 'NcRS'
+        then:
+            assert rec['003'] instanceof ControlField
+            assert rec['003'].data == "NcRS"
+
+    }
+
+    def "assigning to the 007 yields a list of control fields"() {
+        when:
+            rec['007'] = "whatever"
+        then:
+            assert rec['007'] instanceof List
+            assert rec['007'].size() == 1
+            assert rec['007'][0].data == "whatever"
     }
 
 }

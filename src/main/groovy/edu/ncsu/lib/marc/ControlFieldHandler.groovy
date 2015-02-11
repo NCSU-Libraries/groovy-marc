@@ -24,7 +24,8 @@ import org.marc4j.marc.Record
 import org.marc4j.marc.VariableField
 
 /**
- * Handler that provides implementations of common Groovy methods for MARC control fields (001-008)
+ * Handler that provides implementations of common Groovy methods for MARC control fields (001-008);
+ * getValue() on an 007 field returns a list, while the others return a single ControlField object.
  */
 class ControlFieldHandler extends FieldHandler {
 
@@ -32,19 +33,51 @@ class ControlFieldHandler extends FieldHandler {
         super(closure,tag)
     }
 
-
-    ControlField getValue(Record rec) {
-        rec.getVariableField(tag)
+    /**
+     * @param rec
+     * @return
+     */
+    def getValue(Record rec) {
+        return "007".equals(tag) ? rec.getVariableFields(tag) : rec.getVariableField(tag)
     }
 
-    def setValue(Record rec, String value) {
-        ControlField field = rec.getVariableField(tag)
+    /**
+     * Sets the value of the field for a single-vlaue
+     * @param rec the record to which the field is being added.
+     * @param value the value to set on the field.
+     * @return
+     */
+    def setValue(Record rec, String ... values) {
+        if ( "007" == tag ) {
+            return setValues(rec[values])
+        }
+        ControlField field = rec.getVariableFields(tag)
         if ( field == null ) {
             field = factory.newControlField(tag)
             rec.addVariableField(field)
         }
-        field.setData(value)
+        field.setData(values[0])
         field
+    }
+
+    /**
+     * Sets multiple values (for the 007 only)
+     * @param rec
+     * @param values
+     * @return
+     */
+    def setValues(Record rec, List<String> values) {
+        rec.getControlFields().each { fld ->
+                if ( fld.tag == tag ) {
+                    rec.removeVariableField(fld)
+                }
+        }
+        values.each { value ->
+
+            def fld = factory.newControlField(tag,value)
+            rec.addVariableField(fld)
+        }
+        return rec.getVariableFields(tag)
     }
 
     def delete(Record rec) {

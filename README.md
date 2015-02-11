@@ -33,7 +33,6 @@ instances, allowing "groovyesque" methods of reading, modifying, and collecting 
     def reader = ReaderFactory.newReader( new File("mymarc.mrc") )
     reader.each { Record rec -> ... }
 
-
 If you compile this library using JDK 8, you can use the Streams API with the reader returned by the factory,
 including auto-parallelizing processing, Java 8 lambdas, and things like that.  When you use JDK 7, the reader
 implements the older Iterable interface without streams (and the name of the artifact generated will include the "jdk7"
@@ -45,20 +44,28 @@ In general, the idea is to allow access to the fields and subfields of a MARC
 record using standard groovy map-style expressions, e.g.
 
 - `record['008']` - returns the 008
+- `record['007']` - returns all the 007s
 - `record["245"]` - returns the 245 field on the record
 - `record["035"]` - returns all the 035s on the record as a list.
 - `record['245']['a']` - returns the 245$a subfield
+- `record['035']['a']` - returns all the 035$a subfields.
 - `record['245'][1]` - returns the value of the first indicator (note integer literal here in second index).
 - `record["245|a"]` - returns the 245 subfield 'a' values; this is equivalent to the second example above.
 
-Note that '|' and '$' are both valid subfield delimiters in an expression, but '$' in a *double-quoted* Groovy string
-indicates interpolation (that is: "245$a" means roughly 'the literal 245 with the Stringified value of the variable
-'a'"), so you will either have to use single quoted strings or escape the '$' to use the more common form, e.g. the
-above expression is equivalent to both `record['245$a']` and `record["245\$a"]`.
+Note that '|' and '$' are both valid subfield delimiters in an expression, but
+'$' in a *double-quoted* Groovy string indicates interpolation (that is:
+"245$a" means roughly 'the literal 245 with the Stringified value of the
+variable 'a'"), so you will either have to use single quoted strings or escape
+the '$' to use the more common form, e.g. the above expression is equivalent to
+both `record['245$a']` and `record["245\$a"]`.
+Expressions usually return lists (of ControlField, DataField, or Subfield as
+appropriate), except where the expression denotes a control field and the 245.
 
-The general default for these expressions is to return lists, because the default assumption of the framework is that
-a field is repeatable.  The 245 tag has been explicitly identified by the framework as non-repeatable, however,
-and so expressions involving it return the single value.  The tagging work is not yet complete (only control fields
+the framework as non-repeatable, however, and so expressions involving it
+return the single value.
+
+
+    The tagging work is not yet complete (only control fields
  and the 245 will be treated as non-repeatable), however, so *most* expressions will return lists of fields.
 
 If you want to look at all the 035s,(e.g.) you would do something like `record["035"].each {
